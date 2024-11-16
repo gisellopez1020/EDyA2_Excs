@@ -1,14 +1,18 @@
-import React from "react";
-import CounterComponent from "./components/Counter";
-import "./App.css";
+import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
+import AuthButtons from "./components/AuthButtons";
 
-function App() {
+const App = () => {
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  const disableAuthButtons = useMemo(() => isAuthenticated, [isAuthenticated]);
+
   return (
-    <>
-      <div>npm install @reduxjs/toolkit react-redux</div>
-      <CounterComponent />
-    </>
+    <div>
+      <h1>Welcome to My App</h1>
+      <AuthButtons disableAuthButtons={disableAuthButtons} />
+    </div>
   );
-}
+};
 
 export default App;
