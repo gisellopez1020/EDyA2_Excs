@@ -1,0 +1,27 @@
+.about-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  min-width: 100vw;
+  background: linear-gradient(135deg, #8f8fff, #fe7b7b);
+  color: #333;
+  font-family: "Inter", sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+
+.about-title {
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #9fccff;
+  margin-bottom: 10px;
+}
+
+.about-description {
+  font-size: 1.2em;
+  line-height: 1.6;
+  max-width: 600px;
+  color: #555;
+}
