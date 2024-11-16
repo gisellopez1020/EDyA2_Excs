@@ -1,42 +1,77 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { uploadImage, deleteImage } from "./slices/imageSlice";
+import {
+  fetchProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "./slices/productSlice";
 
 function App() {
-  const [file, setFile] = useState(null);
-  const { images, loading, error } = useSelector((state) => state.images);
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [editId, setEditId] = useState(null);
+
+  const { products, loading, error } = useSelector((state) => state.products);
   const dispatch = useDispatch();
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
-  const handleUpload = () => {
-    if (file) {
-      dispatch(uploadImage(file));
-      setFile(null);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (editId) {
+      dispatch(updateProduct({ id: editId, data: { name, price } }));
+      setEditId(null);
+    } else {
+      dispatch(createProduct({ name, price }));
     }
+    setName("");
+    setPrice("");
   };
 
-  const handleDelete = (imageName) => {
-    dispatch(deleteImage(imageName));
+  const handleEdit = (product) => {
+    setName(product.name);
+    setPrice(product.price);
+    setEditId(product.id);
+  };
+
+  const handleDelete = (id) => {
+    dispatch(deleteProduct(id));
   };
 
   return (
     <div className="App">
-      <h1>Upload and Delete Images</h1>
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload} disabled={loading}>
-        {loading ? "Uploading..." : "Upload Image"}
-      </button>
+      <h1>Lista de productos en Firebase</h1>
+
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Nombre del producto"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Precio"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        <button type="submit">
+          {editId ? "Actualizar" : "Crear"} Producto
+        </button>
+      </form>
+
+      {loading && <p>Cargando...</p>}
       {error && <p>Error: {error}</p>}
 
-      <h2>Uploaded Images</h2>
       <ul>
-        {images.map((image) => (
-          <li key={image.name}>
-            <img src={image.url} alt={image.name} width="100" />
-            <button onClick={() => handleDelete(image.name)}>Delete</button>
+        {products.map((product) => (
+          <li key={product.id}>
+            {product.name} - ${product.price}
+            <button onClick={() => handleEdit(product)}>Editar</button>
+            <button onClick={() => handleDelete(product.id)}>Eliminar</button>
           </li>
         ))}
       </ul>
