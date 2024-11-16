@@ -1,12 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import styles from "../styles/Nav.module.css";
 
-const NavComponente = () => {
+const NavComponent = () => {
+  const { state, dispatch } = useAuth();
+
+  const handleLogout = () => {
+    dispatch({ type: "LOGOUT" });
+  };
+
   const list = [
     { id: 1, name: "Home", path: "/" },
     { id: 2, name: "About", path: "/about" },
-    { id: 3, name: "Login", path: "/login" },
+    { id: 3, name: "Private", path: "/private" },
   ];
 
   return (
@@ -14,12 +21,30 @@ const NavComponente = () => {
       <ul>
         {list.map((item) => (
           <li key={item.id}>
-            <Link to={item.path}>{item.name}</Link>
+            <Link to={item.path} className={styles.nav_link}>
+              {item.name}
+            </Link>
           </li>
         ))}
+        {!state.isAuthenticated && (
+          <li>
+            <Link to="/login" className={styles.nav_link}>
+              Login
+            </Link>
+          </li>
+        )}
+        {state.isAuthenticated && (
+          <>
+            <li>
+              <button onClick={handleLogout} className={styles.logout_button}>
+                Logout
+              </button>
+            </li>
+          </>
+        )}
       </ul>
     </nav>
   );
 };
 
-export default NavComponente;
+export default NavComponent;

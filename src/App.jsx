@@ -1,23 +1,61 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import AboutPage from "./pages/About";
+import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
+
 import HomePage from "./pages/Home";
+import AboutPage from "./pages/About";
 import LoginPage from "./pages/Login";
 import NotFoundPage from "./pages/NotFound";
+import PrivatePage from "./pages/Private";
+import NavComponent from "./components/Nav";
 
-import NavComponente from "./components/Nav";
+import { AuthProvider } from "./context/AuthContext";
+import PrivateRoute from "./utils/PrivateRoute";
+import { useAuth } from "./context/AuthContext";
 
-function App() {
+const App = () => {
   return (
-    <BrowserRouter>
-      <NavComponente />
+    <>
+      <NavComponent />
       <Routes>
-        <Route path="/about" element={<AboutPage />}></Route>
-        <Route path="/login" element={<LoginPage />}></Route>
-        <Route path="/" element={<HomePage />}></Route>
-        <Route path="*" element={<NotFoundPage />}></Route>
-      </Routes>
-    </BrowserRouter>
-  );
-}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/login" element={<LoginPage />} />
 
-export default App;
+        <Route element={<PrivateRoute />}>
+          <Route path="/private" element={<PrivatePage />} />
+        </Route>
+
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </>
+  );
+};
+
+const AppWithRouter = () => {
+  const location = useLocation();
+  const { dispatch } = useAuth();
+
+  useEffect(() => {
+    if (location.pathname !== "/login") {
+      dispatch({ type: "SET_LAST_PAGE", payload: location.pathname });
+      return;
+    }
+  }, [location.pathname, dispatch]);
+
+  return <App />;
+};
+
+const MainApp = () => (
+  <AuthProvider>
+    <Router>
+      <AppWithRouter />
+    </Router>
+  </AuthProvider>
+);
+
+export default MainApp;
